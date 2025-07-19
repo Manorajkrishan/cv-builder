@@ -1,80 +1,65 @@
-import { useState } from 'react';
-import axios from 'axios';
-import html2pdf from 'html2pdf.js';
+import { useState } from "react";
+import axios from "axios";
+import html2pdf from "html2pdf.js";
 
-// Firebase Firestore
-import { db } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
-
-// Form Components
-import PersonalInfo from './components/PersonalInfo';
-import Education from './components/Education';
-import Experience from './components/Experience';
-import Skills from './components/Skills';
-import JobDetails from './components/JobDetails';
-import Preview from './components/Preview';
+import PersonalInfo from "./components/PersonalInfo";
+import Education from "./components/Education";
+import Experience from "./components/Experience";
+import Skills from "./components/Skills";
+import JobDetails from "./components/JobDetails";
+import Preview from "./components/Preview";
 
 function App() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    education: '',
-    experience: '',
-    skills: '',
-    jobTitle: '',
-    jobDescription: '',
+    name: "",
+    email: "",
+    phone: "",
+    education: [],
+    experience: [],
+    skills: "",
+    jobTitle: "",
+    jobDescription: "",
   });
 
-  const [generatedText, setGeneratedText] = useState('');
+  const [generatedText, setGeneratedText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  // Generate CV & Cover Letter using OpenAI
   const handleGenerate = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
-      const response = await axios.post('http://localhost:5000/generate', formData);
-      const result = response.data.result;
-      setGeneratedText(result);
-      await saveToFirestore(result);
+      const response = await axios.post("http://localhost:5000/generate", formData);
+      setGeneratedText(response.data.result);
     } catch (err) {
-      console.error('Error generating content:', err);
-      setError('Something went wrong. Please try again.');
+      console.error("Error generating content:", err);
+      setError("Something went wrong. Please try again.");
     }
     setLoading(false);
   };
 
-  // Save data to Firebase Firestore
-  const saveToFirestore = async (generatedText) => {
-    try {
-      await addDoc(collection(db, 'cv_feedback'), {
-        formData,
-        generatedText,
-        timestamp: new Date(),
-      });
-      console.log('Saved to Firestore');
-    } catch (err) {
-      console.error('Error saving to Firestore:', err);
-    }
-  };
-
-  // Download generated output as PDF
   const handleDownloadPDF = () => {
-    const element = document.getElementById('generated-output');
+    const element = document.getElementById("generated-output");
     const opt = {
       margin: 0.5,
-      filename: 'cv_cover_letter.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
+      filename: "cv_cover_letter.pdf",
+      image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
     };
     html2pdf().set(opt).from(element).save();
   };
 
   return (
-    <div className="container my-5">
+    <div
+      className="container my-5 p-4 rounded shadow"
+      style={{
+        maxWidth: "700px",
+        margin: "40px auto",
+        backgroundColor: "rgba(255, 255, 255, 0.9)",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+      }}
+    >
       <h1 className="text-center text-primary mb-4">Smart CV Builder 🚀</h1>
 
       <PersonalInfo formData={formData} setFormData={setFormData} />
@@ -83,29 +68,35 @@ function App() {
       <Skills formData={formData} setFormData={setFormData} />
       <JobDetails formData={formData} setFormData={setFormData} />
       <Preview formData={formData} />
-// Live Preview of the form data
+
       <div className="text-center">
         <button
-          className="btn btn-primary mt-4"
-          onClick={handleGenerate} // Trigger CV generation
+          className="btn btn-primary mt-4 px-4"
+          onClick={handleGenerate}
           disabled={loading}
         >
-          {loading ? 'Generating...' : 'Generate CV & Cover Letter'}
+          {loading ? "Generating..." : "Generate CV & Cover Letter"}
         </button>
       </div>
 
       {error && (
-        <div className="alert alert-danger mt-3 text-center">{error}</div>
+        <div className="alert alert-danger mt-3 text-center" role="alert">
+          {error}
+        </div>
       )}
 
       {generatedText && (
-        <div>
-          <div id="generated-output" className="mt-5 p-4 border rounded bg-white">
-            <h4 className="text-success">Generated Output</h4>
-            <pre style={{ whiteSpace: 'pre-wrap' }}>{generatedText}</pre>
+        <div className="mt-5">
+          <div
+            id="generated-output"
+            className="p-4 border rounded bg-light"
+            style={{ whiteSpace: "pre-wrap", maxHeight: "400px", overflowY: "auto" }}
+          >
+            <h4 className="text-success mb-3">Generated Output</h4>
+            <pre>{generatedText}</pre>
           </div>
           <div className="text-center mt-3">
-            <button className="btn btn-success" onClick={handleDownloadPDF}>
+            <button className="btn btn-success px-4" onClick={handleDownloadPDF}>
               Download as PDF
             </button>
           </div>

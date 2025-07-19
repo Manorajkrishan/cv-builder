@@ -10,14 +10,24 @@ app.use(cors());
 app.use(express.json());
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Make sure your .env file has this key
+  apiKey: process.env.OPENAI_API_KEY, // Your key in .env
 });
 
 app.post('/generate', async (req, res) => {
-  const { name, email, phone, education, experience, skills, jobTitle, jobDescription } = req.body;
+  const {
+    name,
+    email,
+    phone,
+    education,
+    experience,
+    skills,
+    jobTitle,
+    jobDescription,
+    template = "classic",  // Default template
+  } = req.body;
 
   const prompt = `
-Generate a professional CV and cover letter for the following user:
+Generate a professional CV and cover letter in the style of the "${template}" template for the following user:
 Name: ${name}
 Email: ${email}
 Phone: ${phone}
