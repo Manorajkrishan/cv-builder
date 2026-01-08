@@ -47,11 +47,26 @@ function Preview({ formData }) {
             <h5 style={{ color: "#17a2b8", borderBottom: "1px solid #ddd", paddingBottom: "5px" }}>
               🎓 Education
             </h5>
-            <ul style={{ marginLeft: "20px" }}>
-              {formData.education.map((edu, i) => (
-                <li key={i} style={{ marginBottom: "8px" }}>{edu}</li>
-              ))}
-            </ul>
+            {formData.education.map((edu, i) => {
+              const formattedEdu = typeof edu === "string" ? { degree: edu } : edu;
+              return (
+                <div key={i} style={{ marginBottom: "12px", paddingLeft: "10px" }}>
+                  <strong style={{ color: "#17a2b8" }}>{formattedEdu.degree || "Degree"}</strong>
+                  {formattedEdu.institution && (
+                    <span style={{ marginLeft: "8px" }}>from {formattedEdu.institution}</span>
+                  )}
+                  {formattedEdu.field && (
+                    <div style={{ fontSize: "0.9rem", color: "#666" }}>in {formattedEdu.field}</div>
+                  )}
+                  {(formattedEdu.startDate || formattedEdu.endDate) && (
+                    <div style={{ fontSize: "0.85rem", color: "#999" }}>
+                      {formattedEdu.startDate || ""} - {formattedEdu.endDate || "Present"}
+                      {formattedEdu.gpa && ` | GPA: ${formattedEdu.gpa}`}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -60,11 +75,28 @@ function Preview({ formData }) {
             <h5 style={{ color: "#28a745", borderBottom: "1px solid #ddd", paddingBottom: "5px" }}>
               💼 Experience
             </h5>
-            <ul style={{ marginLeft: "20px" }}>
-              {formData.experience.map((exp, i) => (
-                <li key={i} style={{ marginBottom: "8px" }}>{exp}</li>
-              ))}
-            </ul>
+            {formData.experience.map((exp, i) => {
+              const formattedExp = typeof exp === "string" ? { jobTitle: exp } : exp;
+              return (
+                <div key={i} style={{ marginBottom: "12px", paddingLeft: "10px" }}>
+                  <strong style={{ color: "#28a745" }}>{formattedExp.jobTitle || "Position"}</strong>
+                  {formattedExp.company && (
+                    <span style={{ marginLeft: "8px" }}>at {formattedExp.company}</span>
+                  )}
+                  {(formattedExp.startDate || formattedExp.endDate) && (
+                    <div style={{ fontSize: "0.85rem", color: "#999" }}>
+                      {formattedExp.startDate || ""} - {formattedExp.endDate || "Present"}
+                      {formattedExp.location && ` | ${formattedExp.location}`}
+                    </div>
+                  )}
+                  {formattedExp.description && (
+                    <div style={{ fontSize: "0.9rem", color: "#666", marginTop: "4px" }}>
+                      {formattedExp.description}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 

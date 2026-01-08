@@ -4,6 +4,9 @@ import html2pdf from "html2pdf.js";
 import { db } from "./firebase";
 import { collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
 
+// API Configuration
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 import PersonalInfo from "./components/Personalinfo";
 import Education from "./components/Education";
 import Experience from "./components/Experience";
@@ -11,6 +14,8 @@ import Skills from "./components/Skills";
 import JobDetails from "./components/JobDetails";
 import Preview from "./components/Preview";
 import TemplateSelector from "./components/TemplateSelector";
+import AIProviderSelector from "./components/AIProviderSelector";
+import ATSInfo from "./components/ATSInfo";
 
 function App() {
   const [formData, setFormData] = useState({
@@ -25,7 +30,8 @@ function App() {
     skills: "",
     jobTitle: "",
     jobDescription: "",
-    template: "classic",
+    template: "ats-optimized",
+    aiProvider: null,
   });
 
   const [generatedText, setGeneratedText] = useState("");
@@ -62,7 +68,10 @@ function App() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("http://localhost:5000/generate", formData);
+      const response = await axios.post(`${API_URL}/generate`, {
+        ...formData,
+        aiProvider: formData.aiProvider || null,
+      });
       const result = response.data.result;
       setGeneratedText(result);
       
@@ -278,7 +287,9 @@ function App() {
         </div>
       )}
 
+      <AIProviderSelector formData={formData} setFormData={setFormData} />
       <TemplateSelector formData={formData} setFormData={setFormData} />
+      <ATSInfo template={formData.template} />
       <PersonalInfo formData={formData} setFormData={setFormData} />
       <Education formData={formData} setFormData={setFormData} />
       <Experience formData={formData} setFormData={setFormData} />
